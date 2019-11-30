@@ -146,24 +146,15 @@ void loop()
     //  Serial.println();
     //  Serial.println();
 
-    if (idx == 10)
+    logger(thrust, temperature, time); //zapisz na karte
+
+    if (mySerial.available() > 0) //Odczytaj z HC-12
     {
-        if (mySerial.available() > 0) //Odczytaj z HC-12
+        input = mySerial.readString();
+        if (input[0] == 52 && input[1] == 50 && input[2] == 48)
         {
-            input = mySerial.readString();
-            if (input[0] == 52 && input[1] == 50 && input[2] == 48)
-            {
-                plik.close();
-            }
+            plik.close();
         }
-        else
-        {
-            logger(thrust, temperature, time); //zapisz na karte
-        }
-    }
-    else
-    {
-        logger(thrust, temperature, time); //zapisz na karte
     }
 
     idx++
@@ -175,13 +166,22 @@ void logger(float thrust, int temperature, int time)
     char buffer[16];
     dtostrf(thrust, 5, 2, buffer);
 
+    //  { \"thrust\" : %s, \"temp\" : %d, \"time\" : %d },
+
     sprintf(dataSD, ",{ \"thrust\" : %s, \"temp\" : %d, \"time\" : %d }", buffer, temperature, time);
 
     sprintf(data, "{ \"thrust\" : %s, \"temp\" : %d, \"time\" : %d }", buffer, temperature, time);
     //otwórz plik readouts.txt
     plik.println(dataSD); //zapisz dane
     //plik.close();                                            //zamknij/zapisz plik
-    mySerial.println(data); //wyslij dane HC-12
+    if (idx == 10)
+    {
+        mySerial.println("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); //wyslij dane HC-12
+    }
+    else
+    {
+    }
+
     delay(50);
     //Serial.println("Zapisano !");                            //poinformuj o zapisaniu pliku
 }
