@@ -28,11 +28,10 @@
 //////////////////------------------------------------------------------------/////////////////////////////
 
 SoftwareSerial mySerial(RX, TX); //RX, TX
-MAX6675 ktc(KTCCLK, KTCCS, KTCDO);
+//MAX6675 ktc(KTCCLK, KTCCS, KTCDO);
 HX711 scale(DOUT, CLK);
 File plik;
 
-int idx = 0;
 int temp_time = 0;
 float thrust = 0;
 int temperature = 0;
@@ -122,7 +121,6 @@ void setup()
 
 void loop()
 {
-
     if ((millis() - temp_time) > FIRE) //
     {
         digitalWrite(PYRO, LOW); //
@@ -150,14 +148,11 @@ void loop()
 
     if (mySerial.available() > 0) //Odczytaj z HC-12
     {
-        input = mySerial.readString();
-        if (input[0] == 52 && input[1] == 50 && input[2] == 48)
+        if (input[0] == 115 && input[1] == 116 && input[2] == 111 && input[3] == 112)
         {
-            plik.close();
+            plik.close(); //zamknij/zapisz plik
         }
     }
-
-    idx++
 }
 
 void logger(float thrust, int temperature, int time)
@@ -166,21 +161,9 @@ void logger(float thrust, int temperature, int time)
     char buffer[16];
     dtostrf(thrust, 5, 2, buffer);
 
-    //  { \"thrust\" : %s, \"temp\" : %d, \"time\" : %d },
-
-    sprintf(dataSD, ",{ \"thrust\" : %s, \"temp\" : %d, \"time\" : %d }", buffer, temperature, time);
-
     sprintf(data, "{ \"thrust\" : %s, \"temp\" : %d, \"time\" : %d }", buffer, temperature, time);
     //otwórz plik readouts.txt
-    plik.println(dataSD); //zapisz dane
-    //plik.close();                                            //zamknij/zapisz plik
-    if (idx == 10)
-    {
-        mySerial.println("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); //wyslij dane HC-12
-    }
-    else
-    {
-    }
+    plik.println(data); //zapisz dane
 
     delay(50);
     //Serial.println("Zapisano !");                            //poinformuj o zapisaniu pliku
